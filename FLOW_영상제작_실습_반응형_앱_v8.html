@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>FLOW 영상제작 실습 앱 v5</title>
+<style>
+:root{
+  --ink:#17172f; --muted:#686b82; --purple:#7c55f2; --blue:#4387ff; --pink:#f28ab8; --mint:#6bd6d0;
+  --line:rgba(92,80,180,.16); --card:rgba(255,255,255,.80); --shadow:0 18px 46px rgba(50,45,110,.14);
+  --soft:0 10px 26px rgba(55,50,110,.09); --r:24px; --r2:34px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;font-family:ui-rounded,"SF Pro Rounded","Pretendard","Apple SD Gothic Neo","Noto Sans KR",system-ui,sans-serif;color:var(--ink);overflow:hidden;background:
+radial-gradient(circle at 10% 8%,rgba(242,138,184,.18),transparent 28%),
+radial-gradient(circle at 90% 12%,rgba(107,214,208,.20),transparent 26%),
+linear-gradient(180deg,#fff,#f7f6ff)}
+button{font:inherit;border:0;background:none;cursor:pointer}
+.app{height:100dvh;width:100%;max-width:1220px;margin:0 auto;padding:24px;display:grid;grid-template-columns:250px 1fr;grid-template-rows:auto 1fr;gap:18px}
+.top{grid-column:1/-1;height:58px;display:grid;grid-template-columns:92px 1fr 58px;align-items:center}
+.badge{justify-self:start;padding:10px 16px;border-radius:999px;background:rgba(255,255,255,.75);border:1px solid var(--line);box-shadow:var(--soft);font-weight:950;color:#625b96}
+.brand{text-align:center;font-size:26px;font-weight:1000;letter-spacing:-.04em}.brand b{letter-spacing:.08em;background:linear-gradient(90deg,var(--purple),var(--blue));-webkit-background-clip:text;color:transparent}
+.bell{justify-self:end;width:52px;height:52px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.76);border:1px solid var(--line);box-shadow:var(--soft);position:relative}.bell:after{content:"";position:absolute;right:8px;top:8px;width:9px;height:9px;border-radius:50%;background:#ff6584}
+.side{border-radius:32px;padding:18px;background:rgba(255,255,255,.72);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.8);box-shadow:var(--shadow);display:flex;flex-direction:column;gap:10px}
+.side h2{margin:0 0 4px;font-size:23px;letter-spacing:-.06em}.side p{margin:0 0 10px;color:var(--muted);font-weight:750;font-size:13px;line-height:1.45}
+.sidebtn{min-height:56px;border-radius:20px;padding:10px 12px;text-align:left;display:grid;grid-template-columns:32px 1fr;align-items:center;gap:10px;color:#555873;background:rgba(255,255,255,.55);border:1px solid rgba(124,85,242,.09);font-weight:950}
+.sidebtn span{width:32px;height:32px;border-radius:13px;background:rgba(124,85,242,.10);display:grid;place-items:center;color:var(--purple)}
+.sidebtn.active{color:#fff;background:linear-gradient(135deg,#b45bff,#4b87ff);box-shadow:0 16px 30px rgba(83,97,236,.22)}.sidebtn.active span{background:rgba(255,255,255,.22);color:#fff}
+.main{position:relative;overflow:hidden;border-radius:38px;background:rgba(255,255,255,.45);border:1px solid rgba(255,255,255,.68);box-shadow:var(--shadow);padding:28px}
+.screen{position:absolute;inset:28px;display:none;animation:in .25s ease both}.screen.active{display:flex;flex-direction:column}
+@keyframes in{from{opacity:0;transform:translateX(18px)}to{opacity:1;transform:translateX(0)}}
+.head{text-align:center;margin-bottom:20px}.eyebrow{display:inline-flex;padding:7px 13px;border-radius:999px;background:rgba(124,85,242,.1);color:#6752df;font-weight:950;font-size:13px;margin-bottom:8px}
+h1{margin:0;font-size:clamp(44px,5.3vw,70px);line-height:1.02;letter-spacing:-.08em;font-weight:1000;background:linear-gradient(105deg,#17172f,#4a3cc8 62%,#4b8cff);-webkit-background-clip:text;color:transparent}
+.sub{margin:8px auto 0;color:var(--muted);font-weight:750;font-size:17px;line-height:1.42;word-break:keep-all}
+.btn{min-height:52px;border-radius:20px;padding:0 16px;display:inline-flex;align-items:center;justify-content:center;gap:8px;font-weight:1000;letter-spacing:-.04em;white-space:nowrap}.primary{color:white;background:linear-gradient(135deg,#b45bff,#4b87ff);box-shadow:0 14px 28px rgba(83,97,236,.24)}.secondary{color:#32344f;background:rgba(255,255,255,.84);border:1px solid var(--line);box-shadow:var(--soft)}
+.homegrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;flex:1;min-height:0}
+.homehero{border-radius:32px;padding:24px;background:linear-gradient(135deg,#d8c7ff,#cdeeff 54%,#ffe7f0);border:1px solid rgba(255,255,255,.8);box-shadow:var(--soft);display:grid;grid-template-rows:auto 1fr auto;overflow:hidden;position:relative}.homehero:after{content:"";position:absolute;right:-40px;top:-30px;width:190px;height:190px;border-radius:50%;background:rgba(255,255,255,.3)}
+.homehero h2{margin:0;font-size:40px;line-height:1.05;letter-spacing:-.08em}.homehero p{margin:10px 0 0;color:#4d506a;font-weight:800;line-height:1.45;font-size:16px;max-width:420px}
+.preview{align-self:center;height:170px;border-radius:28px;background:linear-gradient(180deg,#ffb06b,#f28ab8 48%,#4650a8);position:relative;overflow:hidden;box-shadow:inset 0 0 36px rgba(255,255,255,.22)}.preview:before{content:"";position:absolute;left:40px;top:34px;width:58px;height:58px;border-radius:50%;background:#fff0a2;box-shadow:0 0 34px rgba(255,229,118,.72)}.preview:after{content:"";position:absolute;left:0;right:0;bottom:0;height:48px;background:linear-gradient(180deg,rgba(255,255,255,.16),rgba(20,24,58,.78));transform:skewY(-4deg)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;z-index:1}.stat{border-radius:18px;background:rgba(255,255,255,.74);padding:10px;text-align:center;font-weight:900;color:#555774}.stat b{display:block;color:var(--purple);font-size:20px}
+.quick{display:grid;grid-template-columns:1fr 1fr;gap:12px}.qcard{border-radius:26px;background:var(--card);border:1px solid rgba(255,255,255,.8);box-shadow:var(--soft);padding:18px;text-align:left;display:flex;flex-direction:column;gap:12px;justify-content:space-between}.qicon{width:46px;height:46px;border-radius:18px;display:grid;place-items:center;background:rgba(124,85,242,.12);font-size:25px}.qcard strong{font-size:19px;letter-spacing:-.05em}.qcard small{color:var(--muted);font-weight:750;line-height:1.35}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.goalgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}.goal{border-radius:26px;background:var(--card);border:1px solid rgba(255,255,255,.8);box-shadow:var(--soft);padding:18px 10px;text-align:center;min-height:180px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}.goal .ico{width:66px;height:66px;border-radius:24px;display:grid;place-items:center;background:linear-gradient(135deg,rgba(124,85,242,.18),rgba(107,214,208,.12));font-size:34px}.goal b{font-size:18px;letter-spacing:-.05em}.goal span{font-size:13px;color:var(--muted);font-weight:750}
+.summary{margin:18px auto 0;max-width:760px;border-radius:28px;background:var(--card);border:1px solid rgba(124,85,242,.22);box-shadow:var(--soft);padding:18px;display:grid;grid-template-columns:60px 1fr;gap:14px;align-items:center}.tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}.tag{padding:7px 12px;border-radius:999px;background:rgba(124,85,242,.1);color:#6049d7;font-weight:950;font-size:13px}
+.scenegrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.scard{border-radius:26px;background:var(--card);border:1px solid rgba(255,255,255,.8);box-shadow:var(--soft);overflow:hidden}.art{height:110px;display:grid;place-items:center;font-size:34px;position:relative}.scard:nth-child(1) .art{background:linear-gradient(180deg,#ffb06b,#f28ab8 48%,#4650a8)}.scard:nth-child(2) .art{background:linear-gradient(135deg,#8a5f43,#ffd5a8 50%,#7a5f9e)}.scard:nth-child(3) .art{background:linear-gradient(135deg,#7886d8,#f3a5c7 52%,#ffc778)}.scard:nth-child(4) .art{background:linear-gradient(180deg,#221947,#5b3f7c 48%,#1a1631)}
+.art span{width:54px;height:54px;border-radius:20px;background:rgba(255,255,255,.65);display:grid;place-items:center;box-shadow:0 10px 22px rgba(30,30,70,.12)}
+.sbody{padding:14px}.sbody b{display:block;font-size:18px;letter-spacing:-.05em}.sbody small{display:block;color:var(--muted);font-weight:750;margin-top:5px}.sfoot{display:flex;justify-content:space-between;align-items:center;margin-top:12px}.time{padding:7px 10px;border-radius:999px;background:rgba(124,85,242,.1);color:#674fe2;font-weight:950;font-size:12px}
+.detail-layout{display:grid;grid-template-columns:270px 1fr;gap:14px;flex:1;min-height:0}.scene-list{display:grid;gap:10px;align-content:start}.select-scene{border-radius:22px;background:rgba(255,255,255,.7);border:1px solid var(--line);box-shadow:var(--soft);padding:12px;text-align:left;display:grid;grid-template-columns:54px 1fr;gap:10px;align-items:center}.select-scene.active{outline:2px solid rgba(124,85,242,.45);background:rgba(124,85,242,.08)}.miniart{height:54px;border-radius:18px;display:grid;place-items:center;font-size:24px}.select-scene:nth-child(1) .miniart{background:linear-gradient(180deg,#ffb06b,#4650a8)}.select-scene:nth-child(2) .miniart{background:linear-gradient(135deg,#8a5f43,#ffd5a8,#7a5f9e)}.select-scene:nth-child(3) .miniart{background:linear-gradient(135deg,#7886d8,#ffc778)}.select-scene:nth-child(4) .miniart{background:linear-gradient(180deg,#221947,#5b3f7c)}
+.select-scene b{font-size:16px}.select-scene small{display:block;color:var(--muted);font-weight:750;margin-top:3px}.panel{border-radius:30px;background:var(--card);border:1px solid rgba(255,255,255,.82);box-shadow:var(--soft);padding:18px;display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}.bigshot{height:260px;border-radius:26px;position:relative;overflow:hidden;border:1px solid rgba(255,255,255,.75);box-shadow:inset 0 0 34px rgba(255,255,255,.25)}
+.panel h2{margin:0;font-size:38px;letter-spacing:-.07em}.row{display:grid;grid-template-columns:58px 1fr;gap:8px;padding:10px 0;border-bottom:1px solid rgba(90,84,160,.12)}.row b{color:var(--purple)}.row span{color:#4e5268;font-weight:800}.promptbox{margin-top:12px;padding:14px;border-radius:20px;background:rgba(124,85,242,.07);border:1px solid rgba(124,85,242,.16);font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13px;line-height:1.55;color:#24243e;word-break:break-word}
+.sample-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}.sample{height:78px;border-radius:18px;position:relative;overflow:hidden}.label{position:absolute;left:8px;bottom:8px;padding:5px 8px;border-radius:999px;background:rgba(255,255,255,.78);font-weight:950;font-size:11px}
+.visualgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.vcard{border-radius:26px;background:var(--card);border:1px solid rgba(255,255,255,.8);box-shadow:var(--soft);padding:12px}.pair{display:grid;gap:8px}.shot{height:128px;border-radius:22px;position:relative;overflow:hidden;border:1px solid rgba(255,255,255,.7)}.arrow{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;margin:-2px auto;background:rgba(124,85,242,.1);color:var(--purple);font-weight:1000;transform:rotate(90deg)}.vcap{display:flex;justify-content:space-between;gap:8px;margin-top:10px;font-weight:850;color:#50536b;font-size:13px}.vcap b{color:var(--purple)}
+.tip{margin:12px auto 0;max-width:760px;border-radius:22px;background:rgba(124,85,242,.08);border:1px solid rgba(124,85,242,.15);padding:14px 16px;text-align:center;color:#42455f;font-weight:800}
+.missiongrid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}.mission{min-height:128px;border-radius:24px;background:var(--card);border:1px solid rgba(255,255,255,.8);box-shadow:var(--soft);display:grid;place-items:center;text-align:center;font-weight:950}.mission span{display:block;font-size:40px;margin-bottom:6px}.formula{margin:14px auto 0;max-width:820px;border-radius:28px;background:linear-gradient(135deg,rgba(255,255,255,.9),rgba(245,242,255,.82));border:1px solid rgba(124,85,242,.22);box-shadow:var(--soft);padding:18px;text-align:center}.formula div{font-size:38px;font-weight:1000;letter-spacing:-.06em;color:#5043d2;margin:8px 0}.example{padding:12px;border-radius:18px;background:rgba(255,255,255,.76);border:1px solid var(--line);color:#7657de;font-weight:900}
+.sunset{background:linear-gradient(180deg,#ffb06b,#f28ab8 44%,#4650a8)}.rainy{background:linear-gradient(180deg,#8ca8df,#64749f 48%,#27314f)}.cafe{background:linear-gradient(135deg,#8a5f43,#ffd5a8 48%,#7a5f9e)}.rooftop{background:linear-gradient(180deg,#24195a,#5b3fab 48%,#11162f)}.warm{background:linear-gradient(135deg,#ffcf9f,#ff9f9f 52%,#9d69d8)}.neon{background:linear-gradient(180deg,#15122f,#231a54 52%,#08101f)}
+.sunset:before,.shot.sunset:before{content:"";position:absolute;left:18%;top:18%;width:42px;height:42px;border-radius:50%;background:#fff0a2;box-shadow:0 0 30px rgba(255,229,118,.7)}.rainy:before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(112deg,rgba(255,255,255,.58) 0 2px,transparent 3px 13px)}.cafe:before{content:"";position:absolute;width:55%;height:85%;left:8%;top:0;background:linear-gradient(90deg,rgba(255,255,255,.2),rgba(255,255,255,.52),rgba(255,255,255,.16))}.cafe:after,.warm:after{content:"";position:absolute;left:50%;bottom:24px;transform:translateX(-50%);width:54px;height:28px;border-radius:0 0 18px 18px;background:rgba(255,255,255,.82)}.rooftop:before{content:"";position:absolute;left:0;right:0;bottom:0;height:44%;background:linear-gradient(to top,#10162f 0 70%,transparent 71%),repeating-linear-gradient(90deg,transparent 0 18px,rgba(255,217,123,.55) 19px 22px,transparent 23px 34px)}.neon:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent 0 18%,rgba(255,67,224,.55) 19% 21%,transparent 22% 62%,rgba(48,208,255,.52) 63% 65%,transparent 66%),radial-gradient(circle at 35% 34%,rgba(255,71,216,.9) 0 9%,transparent 10%),radial-gradient(circle at 66% 52%,rgba(65,178,255,.88) 0 11%,transparent 12%)}
+
+.mission-layout{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
+.missiongrid{grid-template-columns:repeat(3,1fr)}
+.mission.active{outline:2px solid rgba(124,85,242,.5);background:rgba(124,85,242,.09)}
+.mission-panel{border-radius:30px;background:var(--card);border:1px solid rgba(255,255,255,.82);box-shadow:var(--soft);padding:18px}
+.mission-shot{height:170px;border-radius:26px;background:linear-gradient(135deg,#d8c7ff,#cdeeff 54%,#ffe7f0);display:grid;place-items:center;font-size:64px;box-shadow:inset 0 0 34px rgba(255,255,255,.28);position:relative;overflow:hidden}
+.mission-shot:after{content:"";position:absolute;right:-28px;top:-28px;width:130px;height:130px;border-radius:50%;background:rgba(255,255,255,.32)}
+.mission-panel h2{margin:14px 0 6px;font-size:34px;letter-spacing:-.07em}
+.mission-panel p{margin:0;color:var(--muted);font-weight:800;line-height:1.45;word-break:keep-all}
+.mission-prompt{margin-top:12px}
+.formula.compact{margin-top:12px;padding:15px}.formula.compact div{font-size:26px}
+
+@media(max-width:859px){
+ .mission-layout{grid-template-columns:1fr}
+ .missiongrid{grid-template-columns:repeat(3,1fr)}
+ .mission-panel{padding:14px}
+ .mission-shot{height:120px;font-size:48px}
+ .mission-panel h2{font-size:28px}
+ .formula.compact div{font-size:22px}
+}
+@media(max-height:760px) and (max-width:859px){
+ .mission-shot{height:82px}
+ .mission-panel h2{margin:8px 0 4px}
+ .mission-panel p{font-size:13px}
+ .formula.compact{display:none}
+}
+
+
+.sample-controls{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
+  margin-top:12px;
+}
+.sample-btn{
+  min-height:42px;
+  border-radius:16px;
+  padding:8px 10px;
+  background:rgba(255,255,255,.80);
+  border:1px solid var(--line);
+  box-shadow:var(--soft);
+  color:#3c3e5b;
+  font-weight:950;
+  font-size:12px;
+  letter-spacing:-.04em;
+}
+.sample-btn.active{
+  color:#fff;
+  background:linear-gradient(135deg,#b45bff,#4b87ff);
+  border-color:transparent;
+}
+.sample-note{
+  margin-top:8px;
+  color:var(--muted);
+  font-weight:750;
+  font-size:12.5px;
+  line-height:1.35;
+  word-break:keep-all;
+}
+.bigshot .shot-title{
+  position:absolute;
+  left:16px;
+  bottom:16px;
+  z-index:4;
+  padding:8px 12px;
+  border-radius:999px;
+  background:rgba(255,255,255,.78);
+  color:#242640;
+  font-weight:950;
+  font-size:13px;
+  box-shadow:0 8px 18px rgba(30,30,70,.12);
+}
+.bigshot .shot-desc{
+  position:absolute;
+  right:16px;
+  top:16px;
+  z-index:4;
+  padding:8px 12px;
+  border-radius:16px;
+  background:rgba(255,255,255,.72);
+  color:#4d5068;
+  font-weight:850;
+  font-size:12px;
+  max-width:190px;
+  line-height:1.35;
+  word-break:keep-all;
+}
+.park{background:linear-gradient(180deg,#9fdc8d,#ffd18a 52%,#7b7fcf)}
+.desk{background:linear-gradient(135deg,#b7a7ff,#f4d8ff 52%,#fff0c2)}
+.store{background:linear-gradient(135deg,#ffc0d4,#ffe1ad 52%,#9bdbe0)}
+.ocean{background:linear-gradient(180deg,#87d9ff,#d8f8ff 55%,#ffe0a8)}
+.drive{background:linear-gradient(180deg,#191a45,#4c42a4 55%,#080b1c)}
+@media(max-width:859px){
+ .sample-controls{grid-template-columns:repeat(3,1fr)}
+ .sample-btn{font-size:11.5px;min-height:38px;padding:7px 6px}
+ .bigshot .shot-desc{display:none}
+}
+@media(max-height:760px) and (max-width:859px){
+ .sample-note{display:none}
+ .sample-controls{margin-top:8px}
+}
+
+.toast{position:fixed;left:50%;bottom:34px;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;background:rgba(26,27,49,.92);color:#fff;padding:11px 16px;border-radius:999px;font-weight:950;transition:.25s;z-index:40}.toast.show{opacity:1;transform:translateX(-50%)}
+.mobile-nav{display:none}
+@media(max-width:859px){
+ .app{max-width:520px;padding:16px;grid-template-columns:1fr;grid-template-rows:auto 1fr auto}.side{display:none}.main{border-radius:0;background:transparent;border:0;box-shadow:none;padding:0}.screen{inset:0}.mobile-nav{display:grid;height:70px;border-radius:28px;background:rgba(255,255,255,.84);border:1px solid rgba(255,255,255,.72);box-shadow:var(--shadow);grid-template-columns:repeat(4,1fr);padding:7px}.navitem{border-radius:20px;color:#8c8fa5;font-weight:850;font-size:11.5px;display:grid;place-items:center}.navitem.active{background:rgba(124,85,242,.1);color:var(--purple)}
+ .top{height:52px;grid-template-columns:70px 1fr 50px}.brand{font-size:19px}.bell{width:46px;height:46px}.badge{font-size:14px;padding:8px 13px}
+ .head{margin-bottom:12px}h1{font-size:clamp(36px,10vw,50px)}.sub{font-size:14px}.homegrid{grid-template-columns:1fr}.homehero{min-height:auto;padding:18px}.homehero h2{font-size:32px}.homehero p{font-size:14px}.preview{height:130px}.stats{grid-template-columns:repeat(4,1fr)}.stat{font-size:12px;padding:8px 5px}.stat b{font-size:17px}
+ .quick{grid-template-columns:1fr 1fr}.qcard{min-height:102px;padding:14px}.qicon{width:40px;height:40px}.qcard strong{font-size:16px}.qcard small{font-size:12px}
+ .goalgrid{grid-template-columns:repeat(2,1fr)}.goal{min-height:118px;padding:12px}.goal .ico{width:48px;height:48px;font-size:26px}.goal b{font-size:16px}
+ .summary{grid-template-columns:48px 1fr;margin-top:12px;padding:14px}.scenegrid{grid-template-columns:1fr 1fr}.art{height:78px}.scard{min-height:166px}.sbody{padding:12px}.sbody b{font-size:16px}
+ .detail-layout{grid-template-columns:1fr}.scene-list{grid-template-columns:repeat(2,1fr)}.select-scene{grid-template-columns:42px 1fr;padding:9px}.miniart{height:42px}.select-scene b{font-size:13px}.select-scene small{font-size:11px}
+ .panel{grid-template-columns:1fr;padding:14px;gap:12px}.bigshot{height:150px}.panel h2{font-size:28px}.sample-row{grid-template-columns:repeat(3,1fr)}.sample{height:58px}.promptbox{font-size:12px}
+ .visualgrid{grid-template-columns:1fr}.vcard{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:center}.pair{grid-template-columns:1fr 34px 1fr;align-items:center}.shot{height:92px}.arrow{transform:none;margin:0}.vcap{display:block;margin:0}.tip{font-size:13px}
+ .missiongrid{grid-template-columns:repeat(3,1fr)}.mission{min-height:96px}.mission span{font-size:32px}.formula div{font-size:26px}.actions{grid-template-columns:1fr 1fr}.btn{min-height:48px;font-size:15px}
+}
+@media(max-height:760px) and (max-width:859px){
+ .homehero p{display:none}.preview{height:98px}.qcard{min-height:82px}.goal{min-height:96px}.scenegrid{gap:8px}.art{height:60px}.scard{min-height:142px}.bigshot{height:120px}.sample{height:48px}.mission{min-height:78px}
+}
+</style>
+</head>
+<body>
+<main class="app">
+<header class="top"><div class="badge" id="progress">1/6</div><div class="brand"><b>FLOW</b> 영상제작 실습</div><button class="bell">♡</button></header>
+<aside class="side">
+<h2>수업 목차</h2><p>장면을 고르면 오른쪽에서 바로 확인하는 구조입니다.</p>
+<button class="sidebtn active" onclick="goTo(0)"><span>1</span>메인 홈</button>
+<button class="sidebtn" onclick="goTo(1)"><span>2</span>실습 목표</button>
+<button class="sidebtn" onclick="goTo(2)"><span>3</span>영상 구성</button>
+<button class="sidebtn" onclick="goTo(3)"><span>4</span>장면 상세</button>
+<button class="sidebtn" onclick="goTo(4)"><span>5</span>단어 바꾸기</button>
+<button class="sidebtn" onclick="goTo(5)"><span>6</span>응용 미션</button>
+</aside>
+<section class="main">
+<article class="screen active" data-tab="home">
+<div class="head"><span class="eyebrow">🏠 메인 홈</span><h1>나의 FLOW 실습</h1><p class="sub">수강생이 바로 시작하고, 장면을 익히고, 프롬프트까지 따라 하는 실습 앱</p></div>
+<div class="homegrid">
+<div class="homehero"><div><h2>퇴근 후 작은 힐링</h2><p>15초 감성 숏폼을 4개의 장면으로 만들어봅니다. 복잡한 편집보다 분위기와 감정에 집중해요.</p></div><div class="preview"></div><div class="stats"><div class="stat"><b>15초</b>완성</div><div class="stat"><b>4컷</b>구성</div><div class="stat"><b>5개</b>기능</div><div class="stat"><b>초급</b>난이도</div></div></div>
+<div><div class="quick">
+<button class="qcard" onclick="goTo(2)"><div class="qicon">🎬</div><strong>장면 먼저 보기</strong><small>4개 컷 흐름을 확인해요.</small></button>
+<button class="qcard" onclick="goTo(3)"><div class="qicon">☕</div><strong>장면 상세</strong><small>장면을 누르면 상세가 바뀌어요.</small></button>
+<button class="qcard" onclick="goTo(4)"><div class="qicon">🔁</div><strong>단어 바꾸기</strong><small>비교컷으로 차이를 봐요.</small></button>
+<button class="qcard" onclick="goTo(5)"><div class="qicon">🚀</div><strong>응용 미션</strong><small>내 주제로 바꿔봅니다.</small></button>
+</div><div class="actions"><button class="btn primary" onclick="goTo(1)">✨ 수업 시작</button><button class="btn secondary" onclick="goTo(3)">장면 상세</button></div></div>
+</div>
+</article>
+
+<article class="screen" data-tab="practice">
+<div class="head"><span class="eyebrow">🪄 핵심 기능</span><h1>실습 목표</h1><p class="sub">이번 수업에서 꼭 경험할 핵심 기능</p></div>
+<div class="goalgrid">
+<div class="goal"><div class="ico">🎞️</div><b>장면 생성</b><span>컷별 영상 만들기</span></div><div class="goal"><div class="ico">📷</div><b>카메라 무드</b><span>감성 분위기 잡기</span></div><div class="goal"><div class="ico">🔗</div><b>영상 연결</b><span>컷 흐름 이어보기</span></div><div class="goal"><div class="ico">🎵</div><b>음악 분위기</b><span>무드에 맞는 사운드</span></div><div class="goal"><div class="ico">🔤</div><b>자막 느낌</b><span>감성적인 마무리</span></div>
+</div>
+<div class="summary"><div class="qicon">⭐</div><div><b style="font-size:24px">결과물 느낌</b><div class="tags"><span class="tag">릴스</span><span class="tag">쇼츠</span><span class="tag">감성 브이로그</span></div></div></div>
+<div class="actions"><button class="btn primary" onclick="goTo(2)">다음</button><button class="btn secondary" onclick="goTo(0)">홈</button></div>
+</article>
+
+<article class="screen" data-tab="scene">
+<div class="head"><span class="eyebrow">🎬 4컷 구성</span><h1>영상 구성</h1><p class="sub">15초 완성, 4개의 장면으로 진행</p></div>
+<div class="scenegrid">
+<div class="scard"><div class="art"><span>🌇</span></div><div class="sbody"><b>장면 1 퇴근길</b><small>노을지는 거리</small><div class="sfoot"><span class="time">3초</span><button class="btn secondary" onclick="goToDetail(0)">보기</button></div></div></div>
+<div class="scard"><div class="art"><span>☕</span></div><div class="sbody"><b>장면 2 카페</b><small>창가 커피 한 잔</small><div class="sfoot"><span class="time">5초</span><button class="btn secondary" onclick="goToDetail(1)">보기</button></div></div></div>
+<div class="scard"><div class="art"><span>🍃</span></div><div class="sbody"><b>장면 3 힐링 순간</b><small>바람과 여유</small><div class="sfoot"><span class="time">4초</span><button class="btn secondary" onclick="goToDetail(2)">보기</button></div></div></div>
+<div class="scard"><div class="art"><span>🌆</span></div><div class="sbody"><b>장면 4 엔딩</b><small>커피 컵 + 자막</small><div class="sfoot"><span class="time">3초</span><button class="btn secondary" onclick="goToDetail(3)">보기</button></div></div></div>
+</div>
+<div class="actions"><button class="btn primary" onclick="goTo(3)">장면 상세 보기</button><button class="btn secondary" onclick="goTo(1)">이전</button></div>
+</article>
+
+<article class="screen" data-tab="scene">
+<div class="head"><span class="eyebrow">👆 클릭 상세</span><h1>장면 상세</h1><p class="sub">왼쪽에서 장면을 선택하면 오른쪽 상세 내용이 바로 바뀝니다</p></div>
+<div class="detail-layout">
+<div class="scene-list" id="sceneList"></div>
+<div class="panel">
+<div>
+<div class="bigshot" id="detailShot"></div>
+<div class="sample-controls" id="sampleControls"></div>
+<div class="sample-note" id="sampleNote">샘플 컷을 선택하면 위 미리보기가 바뀝니다.</div>
+</div>
+<div>
+<h2 id="detailTitle">장면 1</h2>
+<div class="row"><b>화면</b><span id="detailScreen"></span></div>
+<div class="row"><b>시간</b><span id="detailTime"></span></div>
+<div class="row"><b>무드</b><span id="detailMood"></span></div>
+<div class="promptbox" id="detailPrompt"></div>
+<div class="actions"><button class="btn primary" onclick="copyPrompt()">프롬프트 복사</button><button class="btn secondary" onclick="nextScene()">다음 장면</button></div>
+</div>
+</div>
+</div>
+</article>
+
+<article class="screen" data-tab="practice">
+<div class="head"><span class="eyebrow">🔁 변형 실습</span><h1>한 단어 바꿔보기</h1><p class="sub">단어 하나만 바꿔도 색감, 장소, 분위기가 달라집니다</p></div>
+<div class="visualgrid" id="compareGrid"></div>
+<div class="tip">💡 문장을 길게 쓰기보다 핵심 단어를 바꿔 결과 차이를 비교해보세요.</div>
+<div class="actions"><button class="btn primary" onclick="regenerate()">다시 생성</button><button class="btn secondary" onclick="goTo(5)">응용 미션</button></div>
+</article>
+
+<article class="screen" data-tab="note">
+<div class="head"><span class="eyebrow">🎉 마무리 미션</span><h1>응용 미션</h1><p class="sub">이제 내 스타일로 바꿔볼 차례</p></div>
+<div class="mission-layout">
+  <div>
+    <div class="missiongrid">
+      <button class="mission active" data-mission="강아지 산책" onclick="mission('강아지 산책')"><span>🐶</span>강아지 산책</button>
+      <button class="mission" data-mission="밤 드라이브" onclick="mission('밤 드라이브')"><span>🚗</span>밤 드라이브</button>
+      <button class="mission" data-mission="바다 여행" onclick="mission('바다 여행')"><span>🏝️</span>바다 여행</button>
+      <button class="mission" data-mission="공부 브이로그" onclick="mission('공부 브이로그')"><span>📖</span>공부 브이로그</button>
+      <button class="mission" data-mission="시니어 일상" onclick="mission('시니어 일상')"><span>👵</span>시니어 일상</button>
+      <button class="mission" data-mission="매장 홍보" onclick="mission('매장 홍보')"><span>🏪</span>매장 홍보</button>
+    </div>
+    <div class="formula compact"><b>초간단 공식</b><div>분위기 + 장소 + 감정 + 카메라 느낌</div></div>
+  </div>
+
+  <div class="mission-panel">
+    <div class="mission-shot" id="missionShot"><span id="missionEmoji">🐶</span></div>
+    <h2 id="missionTitle">강아지 산책</h2>
+    <p id="missionDesc">따뜻하고 귀여운 일상 브이로그 느낌으로 바꿔봅니다.</p>
+    <div class="promptbox mission-prompt" id="missionPrompt">cute dog walk + sunset park + healing mood + cinematic vlog style</div>
+    <div class="actions">
+      <button class="btn primary" onclick="copyCurrentMission()">프롬프트 복사</button>
+      <button class="btn secondary" onclick="randomMission()">랜덤 미션</button>
+    </div>
+  </div>
+</div>
+<div class="actions"><button class="btn secondary" onclick="goTo(0)">처음으로</button><button class="btn primary" onclick="goTo(3)">장면 상세로</button></div>
+</article>
+</section>
+<nav class="mobile-nav"><button class="navitem active" onclick="goTo(0)" data-tabname="home">⌂<br>홈</button><button class="navitem" onclick="goTo(2)" data-tabname="scene">▣<br>장면</button><button class="navitem" onclick="goTo(1)" data-tabname="practice">◎<br>실습</button><button class="navitem" onclick="goTo(5)" data-tabname="note">≡<br>미션</button></nav>
+</main>
+<div class="toast" id="toast"></div>
+<script>
+const screens=[...document.querySelectorAll('.screen')], progress=document.getElementById('progress'), side=[...document.querySelectorAll('.sidebtn')], nav=[...document.querySelectorAll('.navitem')];
+let current=0, selectedScene=0, selectedSample=0, compareIndex=0, currentMission='cute dog walk + sunset park + healing mood + cinematic vlog style';
+const scenes=[
+{n:'1',title:'퇴근길',emoji:'🌇',cls:'sunset',screen:'노을지는 도시 거리, 천천히 걷는 사람',time:'3초',mood:'sunset · soft wind · cinematic',prompt:'따뜻한 노을빛의 도시 거리, 퇴근 후 천천히 걷는 사람, cinematic lighting, soft wind, realistic, shallow depth of field',
+ samples:[
+  {name:'노을 거리',cls:'sunset',desc:'노을진 도시 거리와 걷는 사람',prompt:'golden sunset city street, person walking slowly after work, cinematic lighting, warm glow, soft breeze, shallow depth of field'},
+  {name:'비 오는 거리',cls:'rainy',desc:'촉촉한 바닥과 차분한 퇴근길',prompt:'rainy city street after work, reflective wet road, calm walking person, moody cinematic lighting, gentle rain atmosphere'},
+  {name:'공원 산책길',cls:'park',desc:'부드러운 바람이 느껴지는 산책 장면',prompt:'peaceful park walkway at sunset, person taking a relaxing walk, soft wind, healing mood, cinematic vlog style'}
+ ]},
+{n:'2',title:'카페',emoji:'☕',cls:'cafe',screen:'창가 카페, 따뜻한 조명, 커피 김',time:'5초',mood:'cozy · warm · relaxing',prompt:'cozy cafe by the window, warm lighting, coffee steam, relaxing mood, cinematic vlog style',
+ samples:[
+  {name:'창가 카페',cls:'cafe',desc:'창가 테이블과 따뜻한 조명',prompt:'cozy cafe by the window, warm lighting, quiet table scene, relaxing mood, cinematic vlog style'},
+  {name:'커피 김',cls:'warm',desc:'커피 김이 올라오는 클로즈업',prompt:'close-up of hot coffee with visible steam, soft warm lighting, calm and cozy cafe mood, cinematic macro shot'},
+  {name:'노을빛 테이블',cls:'sunset',desc:'노을빛이 테이블 위에 번지는 장면',prompt:'sunset light spreading across a cafe table, coffee cup and soft shadows, emotional warm tones, cinematic ending feel'}
+ ]},
+{n:'3',title:'힐링 순간',emoji:'🍃',cls:'warm',screen:'창밖 바람, 조용한 음악, 여유로운 분위기',time:'4초',mood:'peaceful · breeze · soft camera',prompt:'peaceful evening atmosphere, breeze through the window, emotional cinematic scene, soft camera movement',
+ samples:[
+  {name:'창밖 바람',cls:'warm',desc:'빛과 바람이 부드럽게 흔들리는 장면',prompt:'soft sunlight and breeze by the window, peaceful evening atmosphere, gentle movement, emotional cinematic scene'},
+  {name:'책상 위 여유',cls:'desk',desc:'조용한 책상과 편안한 음악 무드',prompt:'calm desk scene with a relaxing mood, quiet ambience, soft light, cozy study-vlog atmosphere'},
+  {name:'바다 바람',cls:'ocean',desc:'여행지처럼 시원한 힐링 컷',prompt:'ocean breeze at sunset, peaceful travel mood, soft cinematic movement, refreshing healing scene'}
+ ]},
+{n:'4',title:'엔딩',emoji:'🌆',cls:'rooftop',screen:'커피 컵, 노을빛, 한 줄 자막',time:'3초',mood:'ending · warm orange · emotional',prompt:'sunset light on coffee cup, emotional ending shot, warm orange tones, cinematic ending',
+ samples:[
+  {name:'커피 컵 엔딩',cls:'cafe',desc:'커피 컵에 시선이 머무는 마무리',prompt:'ending shot focused on a coffee cup, warm light, emotional closing moment, cinematic composition'},
+  {name:'도시 야경',cls:'rooftop',desc:'잔잔한 야경과 엔딩 분위기',prompt:'quiet city night view, emotional ending mood, rooftop ambience, cinematic final shot'},
+  {name:'네온 엔딩',cls:'neon',desc:'트렌디한 색감의 마지막 컷',prompt:'stylish neon-toned ending scene, trendy city mood, dramatic final shot, cinematic lighting'}
+ ]}
+];
+const compareSets=[
+[['sunset','sunset','rainy','rainy','날씨 변화','따뜻한 퇴근길 → 촉촉한 감성'],['cafe','cozy cafe','rooftop','rooftop bar','장소 변화','포근한 카페 → 도시 야경'],['warm','warm','neon','neon','조명 변화','부드러운 무드 → 트렌디한 무드']],
+[['sunset','evening','neon','night neon','시간 변화','저녁 감성 → 밤 도시감'],['cafe','cafe','rainy','rainy window','분위기 변화','편안함 → 잔잔한 비 감성'],['warm','soft light','rooftop','city light','조명 변화','따뜻함 → 세련된 야경']],
+[['rainy','rainy','sunset','golden hour','색감 변화','차분함 → 따뜻한 노을'],['rooftop','rooftop','cafe','cozy cafe','공간 변화','야외 도시감 → 실내 안정감'],['neon','neon','warm','warm','무드 변화','강한 트렌드 → 부드러운 힐링']]
+];
+
+const missionData={
+'강아지 산책':{emoji:'🐶',desc:'따뜻하고 귀여운 일상 브이로그 느낌으로 바꿔봅니다.',prompt:'cute dog walk + sunset park + healing mood + cinematic vlog style'},
+'밤 드라이브':{emoji:'🚗',desc:'도시 야경과 차분한 음악이 어울리는 감성 숏폼입니다.',prompt:'night drive + city lights + calm mood + cinematic camera movement'},
+'바다 여행':{emoji:'🏝️',desc:'시원하고 여유로운 휴식 분위기의 여행 영상입니다.',prompt:'beach trip + blue ocean + peaceful mood + cinematic vlog style'},
+'공부 브이로그':{emoji:'📖',desc:'조용하고 집중되는 책상 위 브이로그 느낌입니다.',prompt:'study vlog + cozy desk + focused mood + soft camera movement'},
+'시니어 일상':{emoji:'👵',desc:'따뜻하고 편안한 하루 기록 느낌으로 만듭니다.',prompt:'senior daily life + morning light + warm mood + documentary vlog style'},
+'매장 홍보':{emoji:'🏪',desc:'소상공인 매장을 감성적으로 소개하는 홍보 영상입니다.',prompt:'small local store + warm lighting + inviting mood + cinematic promotional video'}
+};
+
+function goTo(i){current=Math.max(0,Math.min(5,i));screens.forEach((s,idx)=>s.classList.toggle('active',idx===current));progress.textContent=`${current+1}/6`;side.forEach((b,idx)=>b.classList.toggle('active',idx===current));const tab=screens[current].dataset.tab;nav.forEach(n=>n.classList.toggle('active',n.dataset.tabname===tab));if(current===3) renderSceneDetail();if(current===4) renderCompare();}
+function goToDetail(i){selectedScene=i;selectedSample=0;goTo(3)}
+function renderSceneDetail(){
+ const list=document.getElementById('sceneList');
+ list.innerHTML=scenes.map((s,i)=>`<button class="select-scene ${i===selectedScene?'active':''}" onclick="selectScene(${i})"><div class="miniart">${s.emoji}</div><div><b>장면 ${s.n} ${s.title}</b><small>${s.time} · ${s.mood.split(' · ')[0]}</small></div></button>`).join('');
+ const s=scenes[selectedScene];
+ const sample=s.samples[selectedSample] || s.samples[0];
+ const shot=document.getElementById('detailShot');
+ shot.className='bigshot '+sample.cls;
+ shot.innerHTML=`<span class="shot-title">${sample.name}</span><span class="shot-desc">${sample.desc}</span>`;
+ document.getElementById('detailTitle').innerHTML=`<span style="color:var(--purple)">장면 ${s.n}</span> — ${s.title}`;
+ document.getElementById('detailScreen').textContent=s.screen;
+ document.getElementById('detailTime').textContent=s.time;
+ document.getElementById('detailMood').textContent=s.mood;
+ document.getElementById('detailPrompt').textContent=sample.prompt || s.prompt;
+ document.getElementById('sampleControls').innerHTML=s.samples.map((sampleItem,i)=>`<button class="sample-btn ${i===selectedSample?'active':''}" onclick="selectSample(${i})">${sampleItem.name}</button>`).join('');
+ document.getElementById('sampleNote').textContent=`현재 샘플: ${sample.desc}`;
+}
+function selectScene(i){selectedScene=i;selectedSample=0;renderSceneDetail()}
+function selectSample(i){selectedSample=i;renderSceneDetail()}
+function nextScene(){selectedScene=(selectedScene+1)%scenes.length;selectedSample=0;renderSceneDetail()}
+function copyPrompt(){navigator.clipboard?.writeText(scenes[selectedScene].prompt);toast('프롬프트를 복사했어요')}
+function renderCompare(){const grid=document.getElementById('compareGrid');const set=compareSets[compareIndex];grid.innerHTML=set.map(x=>`<div class="vcard"><div class="pair"><div class="shot ${x[0]}"><span class="label">${x[1]}</span></div><div class="arrow">→</div><div class="shot ${x[2]}"><span class="label">${x[3]}</span></div></div><div class="vcap"><b>${x[4]}</b><span>${x[5]}</span></div></div>`).join('')}
+function regenerate(){compareIndex=(compareIndex+1)%compareSets.length;renderCompare();toast('새 비교컷 예시로 바꿨어요')}
+function mission(name){
+ const data=missionData[name];
+ if(!data) return;
+ currentMission=data.prompt;
+ document.querySelectorAll('.mission').forEach(btn=>btn.classList.toggle('active',btn.dataset.mission===name));
+ const emoji=document.getElementById('missionEmoji'), title=document.getElementById('missionTitle'), desc=document.getElementById('missionDesc'), prompt=document.getElementById('missionPrompt');
+ if(emoji) emoji.textContent=data.emoji;
+ if(title) title.textContent=name;
+ if(desc) desc.textContent=data.desc;
+ if(prompt) prompt.textContent=data.prompt;
+ toast(`${name} 프롬프트를 열었어요`);
+}
+function randomMission(){
+ const names=Object.keys(missionData);
+ const pick=names[Math.floor(Math.random()*names.length)];
+ mission(pick);
+}
+function copyCurrentMission(){navigator.clipboard?.writeText(currentMission);toast('선택 미션 프롬프트를 복사했어요')}
+let timer;function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(timer);timer=setTimeout(()=>t.classList.remove('show'),1600)}
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight')goTo(current+1);if(e.key==='ArrowLeft')goTo(current-1)});
+let sx=0;document.addEventListener('touchstart',e=>sx=e.touches[0].clientX,{passive:true});document.addEventListener('touchend',e=>{const d=e.changedTouches[0].clientX-sx;if(Math.abs(d)>60)d<0?goTo(current+1):goTo(current-1)},{passive:true});
+renderSceneDetail();renderCompare();
+</script>
+</body>
+</html>
